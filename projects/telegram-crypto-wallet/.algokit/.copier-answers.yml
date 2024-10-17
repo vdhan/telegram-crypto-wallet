@@ -1,0 +1,10 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: 1.3.2
+_src_path: gh:algorandfoundation/algokit-python-template
+author_email: anvudh@gmail.com
+author_name: An Vu
+contract_name: wallet
+deployment_language: python
+preset_name: production
+project_name: telegram-crypto-wallet
+
