@@ -6,6 +6,9 @@
     },
     {
       "path": "projects/telegram-crypto-wallet"
+    },
+    {
+      "path": "projects/telegram-bot"
     }
   ],
   "settings": {
