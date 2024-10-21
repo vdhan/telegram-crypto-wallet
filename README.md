@@ -1,22 +1,43 @@
-# telegram-crypto-wallet
+# Telegram Based Crypto Wallet
 
-Welcome to your new AlgoKit project!
+Telegram based crypto wallet use Python and Telegram Bot API.
 
-This is your workspace root. A `workspace` in AlgoKit is an orchestrated collection of standalone projects (backends, smart contracts, frontend apps and etc).
+## Setup
 
-By default, `projects_root_path` parameter is set to `projects`. Which instructs AlgoKit CLI to create a new directory under `projects` directory when new project is instantiated via `algokit init` at the root of the workspace.
+1. Clone this repository to your local machine.
+2. Ensure [Docker](https://www.docker.com/) is installed and operational. Then, install `AlgoKit` following this [guide](https://github.com/algorandfoundation/algokit-cli#install).
+3. Start Algokit localnet:
+```shell
+algokit localnet start
+```
 
-## Getting Started
+4. Access [Telegram BotFather](https://t.me/BotFather) to create a new bot and obtain token `telegram-bot-token`.
+5. Go to folder `ROOT_PROJECT/projects/telegram-bot` and create new .env file with content:
+```shell
+TELEGRAM_BOT_TOKEN="telegram-bot-token"
+```
 
-To get started refer to `README.md` files in respective sub-projects in the `projects` directory.
+6. Create Python virtual environments:
+```shell
+python -m venv .venv
+```
 
-To learn more about algokit, visit [documentation](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/algokit.md).
+7. Install requirements:
+```shell
+source .venv/bin/activate
+pip install -r requirements.txt
+```
 
-### GitHub Codespaces
+8. Run:
+```shell
+python __main__.py
+```
 
-To get started execute:
+9. Go to Telelegram bot created from step 4 and send `/start`
 
-1. `algokit generate devcontainer` - invoking this command from the root of this repository will create a `devcontainer.json` file with all the configuration needed to run this project in a GitHub codespace. [Run the repository inside a codespace](https://docs.github.com/en/codespaces/getting-started/quickstart) to get started.
-2. `algokit init` - invoke this command inside a github codespace to launch an interactive wizard to guide you through the process of creating a new AlgoKit project
+## Optional
 
-Powered by [Copier templates](https://copier.readthedocs.io/en/stable/).
+Explore Algorand networks (include localnet)
+```shell
+algokit explore
+```
