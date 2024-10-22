@@ -1,43 +1,62 @@
 # Telegram Based Crypto Wallet
 
-Telegram based crypto wallet use Python and Telegram Bot API.
+Telegram based crypto wallet use Algorand Python SDK and Telegram Bot API.
 
 ## Setup
 
 1. Clone this repository to your local machine.
 2. Ensure [Docker](https://www.docker.com/) is installed and operational. Then, install `AlgoKit` following this [guide](https://github.com/algorandfoundation/algokit-cli#install).
-3. Start Algokit localnet:
+3. Setup environment:
+```shell
+algokit project bootstrap all
+```
+
+4. Start Algokit localnet:
 ```shell
 algokit localnet start
 ```
 
-4. Access [Telegram BotFather](https://t.me/BotFather) to create a new bot and obtain token `telegram-bot-token`.
-5. Go to folder `ROOT_PROJECT/projects/telegram-bot` and create new .env file with content:
+5. Access [Telegram BotFather](https://t.me/BotFather) to create a new bot and obtain token `telegram-bot-token`.
+6. Go to folder `ROOT_PROJECT/projects/telegram-bot` and create new `.env` file with content:
 ```shell
 TELEGRAM_BOT_TOKEN="telegram-bot-token"
 ```
 
-6. Create Python virtual environments:
+7. Create Python virtual environments:
 ```shell
 python -m venv .venv
 ```
 
-7. Install requirements:
+8. Install requirements:
 ```shell
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-8. Run:
+9. Run:
 ```shell
 python __main__.py
 ```
 
-9. Go to Telelegram bot created from step 4 and send `/start`
+10. Go to Telelegram bot created from step 4 and send `/start`
 
-## Optional
+### Optional
 
 Explore Algorand networks (include localnet)
 ```shell
 algokit explore
 ```
+
+## Key Achievements
+
+- User can use command `/start` to get help.
+- User can use command `/create` to create a new wallet.
+- User can use command `/balance` to check balance.
+
+## Future Feature
+
+- Save data to database (MariaDB, PostgreSQL) for persistent storage.
+- Deploy on cloud (BizFly Cloud, Clearsky) for production.
+- Expand features, make it become full fledged wallet.
+- Integrate multi chain for cross chain transaction.
+- Develop ecosystem: Coin offering, integrate game, payment gateway, ...
