@@ -6,7 +6,7 @@ Telegram based crypto wallet use Algorand Python SDK and Telegram Bot API.
 
 1. Clone this repository to your local machine.
 2. Ensure [Docker](https://www.docker.com/) is installed and operational. Then, install `AlgoKit` following this [guide](https://github.com/algorandfoundation/algokit-cli#install).
-3. Setup environment:
+3. Go to folder `ROOT_PROJECT`, then run:
 ```shell
 algokit project bootstrap all
 ```

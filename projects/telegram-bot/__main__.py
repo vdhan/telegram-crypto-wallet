@@ -26,7 +26,6 @@ async def start(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def create_wallet(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
-    
     user_id = update.effective_user.id
     if user_id in user_wallets:
         await update.message.reply_text('You already have a wallet!')
@@ -49,11 +48,13 @@ async def check_balance(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
         except Exception as e:
             await update.message.reply_text(f'Error checking balance: {str(e)}')
 
+
 async def check_game(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
     if update.message.text.lower() == "game":
         await update.message.reply_text("i have")
     else:
-        await update.message.reply_text("I don't have game for u. But i have that :http://127.0.0.1:5500/projects/game/gold_digger.html")
+        await update.message.reply_text(
+            "I don't have game for u. But i have that :http://127.0.0.1:5500/projects/game/gold_digger.html")
 
 
 async def check_balance_game(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
@@ -76,8 +77,7 @@ if __name__ == '__main__':
     application.add_handler(CommandHandler('start', start))
     application.add_handler(CommandHandler('create', create_wallet))
     application.add_handler(CommandHandler('balance', check_balance))
-    application.add_handler(CommandHandler('game',check_game))
-    application.add_handler(CommandHandler('balance_game',check_balance_game))
-    
+    application.add_handler(CommandHandler('game', check_game))
+    application.add_handler(CommandHandler('balance_game', check_balance_game))
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)

@@ -9,6 +9,9 @@
     },
     {
       "path": "projects/telegram-bot"
+    },
+    {
+      "path": "projects/game"
     }
   ],
   "settings": {

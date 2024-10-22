@@ -1,0 +1,10 @@
+{
+  "name": "telegram-crypto-wallet",
+  "version": "1.0.0",
+  "scripts": {
+    "http": "http-server"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
