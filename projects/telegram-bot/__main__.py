@@ -53,7 +53,7 @@ async def check_game(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
     if update.message.text.lower() == "game":
         await update.message.reply_text("i have")
     else:
-        await update.message.reply_text("I don't have game for u. But i have that :http://127.0.0.1:5500/gold_digger.html")
+        await update.message.reply_text("I don't have game for u. But i have that :http://127.0.0.1:5500/projects/game/gold_digger.html")
 
 
 async def check_balance_game(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
