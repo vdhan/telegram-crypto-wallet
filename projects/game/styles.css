@@ -1,0 +1,81 @@
+.pad {
+    box-sizing: border-box;
+    font-size: 2vw; /* Relative to viewport width */
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    -webkit-user-select: none; /* Safari */        
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */
+}
+
+.fixed {
+    position: fixed;
+    font-size: 2vw; /* Responsive font size */
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+.text-white {
+    color: white;
+}
+
+.items-center {
+    align-items: center;
+    justify-content: center;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center; /* Center the buttons */
+    gap: 20px; /* Space between buttons */
+    margin-top: 20px; /* Space above the button container */
+}
+
+
+.button {
+    padding: 2%;
+    background-color: white; /* New background color */
+    color: green;
+    border-radius: 10px;
+    border: 5px solid black; /* Add border style */
+    font-size: 19px; /* Responsive font size */
+    text-emphasis-color: green;
+    font-weight: normal;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center; /* Center content */
+    transition: transform 0.3s ease-in-out;
+}
+
+.button:hover {
+    background-color: darkgreen; /* Change hover color */
+    cursor: pointer;
+    transform: scale(1.2);
+}
+
+h1{
+    font-weight: normal;
+}
+
+.popup {
+    width: 30vw; /* Responsive width */
+    background-color: rgb(29, 29, 29);
+    padding: 3%;
+    border-radius: 20px;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    position: fixed; /* Changed for better responsiveness */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center the popup */
+    -webkit-user-select: none; /* Safari */        
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */
+}
+
+.start-game-button{
+    display: flex;
+    background-color: antiquewhite;
+}

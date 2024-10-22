@@ -1,0 +1,42 @@
+<head>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMFfD9sZ6F5sYcUJ4Plh9p0W1w8cM0lFf5jOW3" crossorigin="anonymous">
+
+</head>
+<style>
+    body {
+        background: black;
+        margin: 0;
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+    }
+</style>
+<div class="fixed text-white" style="width: 20vw; margin: 1%;">
+    <div class="fixed text-white" style="width: 20vw; margin: 1%;">
+        <span class="pad">Score: </span>
+        <span class="pad" id="score">0</span>
+        <span class="pad">
+            <br>Balance:
+        </span class="pad">
+        <span class="pad"> 0 </span>
+    </div>
+</div>
+<div class="fixed flex items-center popup" id="popup">
+    <h1>Welcome to Shooting Point, an adrenaline-pumping action shooter that tests your skills and reflexes!</h1>
+    <div class="button-container">
+        <div class="button items-center" id="start-game-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" style="margin-right: 10px;">
+                <path d="M8 5v14l11-7z"/>
+            </svg>
+            <div>Start Game</div>
+        </div>
+        
+        <div class="button items-center" id="settings-button">
+            <div style="display: flex; justify-content: center;">Connect Wallet</div>
+        </div>
+    </div>
+          
+</div>
+<canvas></canvas>
+<script src="index.js"></script>
