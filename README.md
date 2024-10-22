@@ -22,7 +22,7 @@ algokit localnet start
 TELEGRAM_BOT_TOKEN="telegram-bot-token"
 ```
 
-7. Create Python virtual environments:
+7. Create Python virtual environment:
 ```shell
 python -m venv .venv
 ```
