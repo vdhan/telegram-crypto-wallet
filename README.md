@@ -33,25 +33,43 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-9. Run:
+9. Go to folder `ROOT_PROJECT/projects/game`, then run:
+```shell
+npm i
+```
+
+### Optional
+
+Explore Algorand networks (include localnet):
+```shell
+algokit explore
+```
+
+## Start
+
+1. Go to folder `ROOT_PROJECT/projects/telegram-bot`, then run:
 ```shell
 python __main__.py
 ```
 
-10. Go to Telelegram bot created from step 4 and send `/start`
+Leave the terminal open
 
-### Optional
-
-Explore Algorand networks (include localnet)
+2. Go to folder `ROOT_PROJECT/projects/game`, then run:
 ```shell
-algokit explore
+npm run http
 ```
+
+Also leave the terminal open, too
+
+3. Go to Telelegram bot created from step 5 of `Setup` and send `/start`
+
 
 ## Key Achievements
 
 - User can use command `/start` to get help.
 - User can use command `/create` to create a new wallet.
 - User can use command `/balance` to check balance.
+- User can use command `/game` to play game.
 
 ## Future Feature
 

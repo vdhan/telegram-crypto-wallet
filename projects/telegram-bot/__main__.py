@@ -1,4 +1,6 @@
 import os
+import textwrap
+
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 from algosdk import account
@@ -20,9 +22,13 @@ user_wallets = {}
 
 
 async def start(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(
-        'Welcome to the Algorand Wallet Bot!\nUse /create to create a new wallet or /balance to check your balance.'
-    )
+    msg = '''
+    Welcome to the Algorand Wallet Bot! Use:
+    /create to create a new wallet
+    /balance to check your balance
+    /game to play game'''
+
+    await update.message.reply_text(textwrap.dedent(msg))
 
 
 async def create_wallet(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
@@ -38,13 +44,17 @@ async def create_wallet(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
 async def check_balance(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
     user_id = update.effective_user.id
     if user_id not in user_wallets:
-        await update.message.reply_text("You don't have a wallet yet. Use /create to create one.")
+        await update.message.reply_text("You don't have a wallet yet. Use /create to create one")
     else:
         address = user_wallets[user_id]['address']
         try:
             account_info = algod_client.account_info(address)
             balance = account_info.get('amount')
-            await update.message.reply_text(f'Your balance is: {balance} microAlgos')
+            msg = f'''
+            Your address is: {address}
+            Your balance is: {balance} microAlgos'''
+
+            await update.message.reply_text(textwrap.dedent(msg))
         except Exception as e:
             await update.message.reply_text(f'Error checking balance: {str(e)}')
 
