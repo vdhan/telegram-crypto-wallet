@@ -60,17 +60,17 @@ async def check_balance(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def check_game(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
-    if update.message.text.lower() == "game":
-        await update.message.reply_text("i have")
+    if update.message.text.lower() == 'game':
+        await update.message.reply_text('I have')
     else:
         await update.message.reply_text(
-            "I don't have game for u. But i have that :http://127.0.0.1:5500/projects/game/gold_digger.html")
+            'Link game: http://127.0.0.1:8080/gold_digger.html')
 
 
 async def check_balance_game(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
     user_id = update.effective_user.id
     if user_id not in user_wallets:
-        await update.message.reply_text("You don't have a wallet yet. Use /create to create one.")
+        await update.message.reply_text("You don't have a wallet yet. Use /create to create one")
     else:
         address = user_wallets[user_id]['address']
         try:
