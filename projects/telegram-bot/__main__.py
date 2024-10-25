@@ -1,9 +1,12 @@
+from decimal import Decimal
 import os
+import sqlite3
 import textwrap
 
 from telegram import Update
-from telegram.ext import Application, CommandHandler, ContextTypes
-from algosdk import account
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from algosdk import account, mnemonic
+from algosdk.transaction import PaymentTxn
 from algosdk.v2client import algod
 from dotenv import load_dotenv
 
@@ -13,81 +16,144 @@ TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 # algod_address = 'https://testnet-api.algonode.cloud'
 # algod_token = ''
 
-algod_address = 'http://localhost:4001'
-algod_token = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-algod_client = algod.AlgodClient(algod_token, algod_address)
-
-# Dictionary to store user wallets
-user_wallets = {}
+ALGOD_ADDRESS = 'http://localhost:4001'
+ALGOD_TOKEN = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+algod_client = algod.AlgodClient(ALGOD_TOKEN, ALGOD_ADDRESS)
 
 
-async def start(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
-    msg = '''
-    Welcome to the Algorand Wallet Bot! Use:
-    /create to create a new wallet
-    /balance to check your balance
-    /game to play game'''
+class AlgorandWallet:
+    def __init__(self) -> None:
+        self.algod_client = algod.AlgodClient(ALGOD_TOKEN, ALGOD_ADDRESS)
+        self.setup_database()
 
-    await update.message.reply_text(textwrap.dedent(msg))
+    def setup_database(self) -> None:
+        con = sqlite3.connect('wallet.db')
+        cur = con.cursor()
+        cur.execute('CREATE TABLE IF NOT EXISTS wallets(user_id TEXT PRIMARY KEY, address TEXT, encrypted_key TEXT)')
+        con.commit()
+        con.close()
 
-
-async def create_wallet(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
-    user_id = update.effective_user.id
-    if user_id in user_wallets:
-        await update.message.reply_text('You already have a wallet!')
-    else:
+    def create(self, user_id: int) -> tuple[str, str]:
         private_key, address = account.generate_account()
-        user_wallets[user_id] = {'private_key': private_key, 'address': address}
-        await update.message.reply_text(f'Your new wallet address is: {address}')
+        seed = mnemonic.from_private_key(private_key)
+
+        conn = sqlite3.connect('wallet.db')
+        c = conn.cursor()
+        c.execute('INSERT OR REPLACE INTO wallets VALUES (?, ?, ?)', [user_id, address, seed])
+        conn.commit()
+        conn.close()
+
+        return address, seed
+
+    async def send_token(self, sender: str, receiver: str, amount: int, sender_key: str) -> str:
+        params = self.algod_client.suggested_params()
+        unsigned_txn = PaymentTxn(
+            sender, params, receiver, amount, note='Telegram wallet transfer'.encode())
+
+        signed_txn = unsigned_txn.sign(sender_key)
+        tx_id = self.algod_client.send_transaction(signed_txn)
+
+        await self.wait_for_confirmation(tx_id)
+        return tx_id
+
+    async def wait_for_confirmation(self, tx_id: str) -> algod.AlgodResponseType:
+        confirmed_txn = self.algod_client.pending_transaction_info(tx_id)
+        return confirmed_txn
 
 
-async def check_balance(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
-    user_id = update.effective_user.id
-    if user_id not in user_wallets:
-        await update.message.reply_text("You don't have a wallet yet. Use /create to create one")
-    else:
-        address = user_wallets[user_id]['address']
+class TelegramBot:
+    def __init__(self) -> None:
+        self.wallet = AlgorandWallet()
+
+    async def start(self, update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
+        msg = '''
+        Welcome to the Algorand Wallet Bot!
+        Available commands:
+        /create - create a new wallet
+        /balance - check your balance
+        /send <address> <amount> - Send tokens to an address
+        /game - play game'''
+
+        await update.message.reply_text(textwrap.dedent(msg))
+
+    async def create(self, update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
+        user_id = update.effective_user.id
+        address, seed = self.wallet.create(user_id)
+        msg = f'''
+        Wallet created successfully!
+        Address: {address}
+        Seed phrase:
+        {seed}
+        ⚠️ IMPORTANT: Save this seed phrase in a secure location. Never share it with anyone!
+        '''
+
+        await update.message.reply_text(textwrap.dedent(msg))
+
+    async def send(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         try:
-            account_info = algod_client.account_info(address)
-            balance = account_info.get('amount')
-            msg = f'''
-            Your address is: {address}
-            Your balance is: {balance} microAlgos'''
+            args = context.args
+            if len(args) != 2:
+                await update.message.reply_text('Usage: /send <address> <amount>')
+                return
 
-            await update.message.reply_text(textwrap.dedent(msg))
+            user_id = update.effective_user.id
+            con = sqlite3.connect('wallet.db')
+            cur = con.cursor()
+            cur.execute('SELECT address, encrypted_key FROM wallets WHERE user_id = ?', [user_id])
+            result = cur.fetchone()
+            con.close()
+            if not result:
+                await update.message.reply_text('Please create a wallet first using /create')
+                return
+
+            receiver = args[0]
+            amount = int(Decimal(args[1]) * 1_000_000)  # Convert to microAlgos
+            sender, seed = result
+            private_key = mnemonic.to_private_key(seed)
+            account_info = self.wallet.algod_client.account_info(sender)
+            balance = account_info.get('amount', 0)
+
+            assert sender != receiver, 'Sender must be different to receiver'
+            assert balance > amount, 'Balance must be greater than amount'
+            assert amount >= 1, 'Amount must be equal or greater than 1 microAlgos'
+
+            tx_id = await self.wallet.send_token(sender, receiver, amount, private_key)
+            await update.message.reply_text(f'Transaction successful! Transaction ID: {tx_id}')
         except Exception as e:
-            await update.message.reply_text(f'Error checking balance: {str(e)}')
+            await update.message.reply_text(f'Error sending tokens: {str(e)}')
 
+    async def balance(self, update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
+        user_id = update.effective_user.id
+        con = sqlite3.connect('wallet.db')
+        cur = con.cursor()
+        cur.execute('SELECT address FROM wallets WHERE user_id = ?', [user_id])
+        result = cur.fetchone()
+        con.close()
+        if not result:
+            await update.message.reply_text('Please create a wallet first using /create')
+            return
 
-async def check_game(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
-    if update.message.text.lower() == 'game':
-        await update.message.reply_text('I have')
-    else:
-        await update.message.reply_text(
-            'Link game: http://127.0.0.1:8080/gold_digger.html')
+        address = result[0]
+        account_info = self.wallet.algod_client.account_info(address)
+        balance = account_info.get('amount', 0) / 1000000  # Convert microAlgos to Algos
+        msg = f'''
+        Address: {address}
+        Balance: {balance} ALGO'''
 
+        await update.message.reply_text(textwrap.dedent(msg))
 
-async def check_balance_game(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
-    user_id = update.effective_user.id
-    if user_id not in user_wallets:
-        await update.message.reply_text("You don't have a wallet yet. Use /create to create one")
-    else:
-        address = user_wallets[user_id]['address']
-        try:
-            account_info = algod_client.account_info(address)
-            balance = account_info.get('amount')
-            await update.message.reply_text(f'Your balance is: {balance} microAlgos')
-        except Exception as e:
-            await update.message.reply_text(f'Error checking balance: {str(e)}')
+    async def game(self, update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
+        await update.message.reply_text('Link game: http://127.0.0.1:8080/gold_digger.html')
 
 
 if __name__ == '__main__':
-    application = Application.builder().token(TOKEN).build()
+    bot = TelegramBot()
+    app = ApplicationBuilder().token(TOKEN).build()
 
-    application.add_handler(CommandHandler('start', start))
-    application.add_handler(CommandHandler('create', create_wallet))
-    application.add_handler(CommandHandler('balance', check_balance))
-    application.add_handler(CommandHandler('game', check_game))
-    application.add_handler(CommandHandler('balance_game', check_balance_game))
+    app.add_handler(CommandHandler('start', bot.start))
+    app.add_handler(CommandHandler('create', bot.create))
+    app.add_handler(CommandHandler('balance', bot.balance))
+    app.add_handler(CommandHandler('send', bot.send))
+    app.add_handler(CommandHandler('game', bot.game))
 
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    app.run_polling()
