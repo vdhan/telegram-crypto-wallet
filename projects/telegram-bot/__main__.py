@@ -1,7 +1,7 @@
-from decimal import Decimal
 import os
 import sqlite3
 import textwrap
+from decimal import Decimal
 
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
