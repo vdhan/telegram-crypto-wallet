@@ -69,11 +69,11 @@ Also leave the terminal open, too
 - User can use command `/start` to get help.
 - User can use command `/create` to create a new wallet.
 - User can use command `/balance` to check balance.
+- User can use command `/send <address> <amount>` to send tokens to an address.
 - User can use command `/game` to play game.
 
 ## Future Feature
 
-- Save data to database (MariaDB, PostgreSQL) for persistent storage.
 - Deploy on cloud (BizFly Cloud, Clearsky) for production.
 - Expand features, make it become full fledged wallet.
 - Integrate multi chain for cross chain transaction.

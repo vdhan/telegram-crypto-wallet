@@ -114,8 +114,8 @@ class TelegramBot:
             balance = account_info.get('amount', 0)
 
             assert sender != receiver, 'Sender must be different to receiver'
-            assert balance > amount, 'Balance must be greater than amount'
             assert amount >= 1, 'Amount must be equal or greater than 1 microAlgos'
+            assert balance > amount, 'Balance must be greater than amount'
 
             tx_id = await self.wallet.send_token(sender, receiver, amount, private_key)
             await update.message.reply_text(f'Transaction successful! Transaction ID: {tx_id}')
