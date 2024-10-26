@@ -13,12 +13,11 @@ from dotenv import load_dotenv
 load_dotenv()
 TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 
-# algod_address = 'https://testnet-api.algonode.cloud'
-# algod_token = ''
-
 ALGOD_ADDRESS = 'http://localhost:4001'
 ALGOD_TOKEN = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-algod_client = algod.AlgodClient(ALGOD_TOKEN, ALGOD_ADDRESS)
+
+# ALGOD_ADDRESS = 'https://testnet-api.algonode.cloud'
+# ALGOD_TOKEN = ''
 
 
 class AlgorandWallet:
@@ -62,6 +61,8 @@ class AlgorandWallet:
 
 
 class TelegramBot:
+    _decimals: int = 1_000_000
+
     def __init__(self) -> None:
         self.wallet = AlgorandWallet()
 
@@ -107,14 +108,14 @@ class TelegramBot:
                 return
 
             receiver = args[0]
-            amount = int(Decimal(args[1]) * 1_000_000)  # Convert to microAlgos
+            amount = int(Decimal(args[1]) * self._decimals)  # Convert to microAlgos
             sender, seed = result
             private_key = mnemonic.to_private_key(seed)
             account_info = self.wallet.algod_client.account_info(sender)
             balance = account_info.get('amount', 0)
 
             assert sender != receiver, 'Sender must be different to receiver'
-            assert amount >= 1, 'Amount must be equal or greater than 1 microAlgos'
+            assert amount >= 1, 'Amount must be greater than or equal to 1 microAlgos'
             assert balance > amount, 'Balance must be greater than amount'
 
             tx_id = await self.wallet.send_token(sender, receiver, amount, private_key)
@@ -135,7 +136,7 @@ class TelegramBot:
 
         address = result[0]
         account_info = self.wallet.algod_client.account_info(address)
-        balance = account_info.get('amount', 0) / 1000000  # Convert microAlgos to Algos
+        balance = account_info.get('amount', 0) / self._decimals  # Convert microAlgos to Algos
         msg = f'''
         Address: {address}
         Balance: {balance} ALGO'''
